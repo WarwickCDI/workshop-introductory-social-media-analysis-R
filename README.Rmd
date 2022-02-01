@@ -2,7 +2,7 @@
 title: 'CDI: Introductory Social Media data collection and Analysis'
 author: "James Tripp"
 date: "01/02/2022"
-output: html_document
+output: rmarkdown::github_document
 link_citations: yes
 bibliography: references.bib
 ---
@@ -123,7 +123,7 @@ library(tidyverse)
 Plotting the Twitter data over time is straight forward. We can use the code from the [rtweet page](https://github.com/ropensci/rtweet). We will also collect more tweet by increasing the n parameter to 18000.
 
 ```{r}
-rt <- search_tweets(query, n = 100, include_rts = FALSE)
+rt <- search_tweets(query, n = 18000, include_rts = FALSE)
 ```
 
 ```{r}
