@@ -1,0 +1,242 @@
+---
+title: 'CDI: Introductory Social Media data collection and Analysis'
+author: "James Trip"
+date: "01/02/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Social media collection and analysis
+
+Here we will collect and summarise data from two social media platforms: Twitter and Reddit. The goal is for you to become familiar with the R language and be able to run your own queries. What is a good query and how does one best analyse data will depend on your own research interests. There is time in this session to discuss those things.
+
+## What you need
+
+-   R and RStudio installed on your computer
+
+-   A twitter account (if you want to download tweets)
+
+Why use social media?
+
+## Libraries
+
+We need additional libraries to do things like download tweets and reddit posts. Running the cell below (by pressing the green play button) will tell R to download the libraries we need.
+
+```{r, echo=FALSE}
+install.packages('rtweet')
+install.packages('RedditExtractoR')
+```
+
+Let us load these libraries into R.
+
+```{r, echo=FALSE}
+library(rtweet)
+library(RedditExtractoR)
+```
+
+## Downloading data
+
+Twitter and Reddit are quite different platforms.
+
+-   On Twitter, you can do things such as follow a single user/bot or search for terms.
+
+-   On Reddit, people post links on subreddits which are voted and commented on.
+
+Both the structure of and communities on the platforms differ. For example, compare a search for global warming on both platforms.
+
+-   [Global warming search on Twitter](https://twitter.com/search?q=global%20warming&src=typed_query)
+
+-   [Global warming search on Reddit](https://www.reddit.com/search/?q=global%20warming)
+
+I will be using the search term 'global warming'. If you would like to use a different term then change it in the cell below.
+
+```{r}
+query <- 'global warming'
+```
+
+Run the data below to collect tweets and links for global warming.
+
+```{r, echo=FALSE}
+df_twitter <- rtweet::search_tweets(query)
+df_reddit <- RedditExtractoR::find_thread_urls(query)
+```
+
+What do the first three lines tell us?
+
+```{r}
+head(df_twitter$text[1:3])
+```
+
+```{r}
+df_reddit$title[1:3]
+```
+
+## Close reading
+
+There are a few hundreds rows in our datasets. Let us take 10 minutes to look at our data closely. You can look at the full result by clicking on the table button in the environment panel. We can do the same using the function View.
+
+```{r}
+View(df_twitter)
+```
+
+```{r}
+View(df_reddit)
+```
+
+Take some time on your own or with a colleague to look at the data closely. We will come back together and discuss as a group in 10 minutes to consider the following questions:
+
+-   What have you found out about your query?
+
+-   What differences are there between platforms?
+
+-   How is the data limited?
+
+### APIs
+
+Our data is collected using APIs for the different platforms. The term Application Programming Interface (API) sounds fancy. In practice, it describes sending some options, such as a search term, to a location (such as web address) and a system sending back some data in a machine readable format (usually JSON). The libraries handles taking our options (e.g., our query), sending the request over the web, then receiving and shaping the data into a format we can use (a data frame).
+
+APIs control the amount and type of data you can collect. The search_tweets function uses an API which collects data from the past 7 days. If you want more data then you will need to sign up for the enterprise or Academic Track accounts. The find_thread_url function queries the Reddit front page and does not need authentication (see the result for global warming and 100 responses [here](https://www.reddit.com/search.json?q=global+warming&sort=top&t=month&limit=100)).
+
+The topic of APIs and their impact on research is an interesting topic. For example, Twitter is often studied because the data is very accessible. However, other platforms such as Tik Tok, YouTube or Weibo may be less studied because the APIs are restrictive. An API can also change over time and the nature of the data collected my be different as new feature are released. Also, how much do you know about the data selection processes via the API and can you validate the robustness of the data?
+
+## More libraries
+
+We are going to use the popular tidyverse set of package. The tidyverse helps make tasks a bit easier and is commonly used in data science with R.
+
+```{r}
+install.packages('tidyverse')
+```
+
+```{r}
+library(tidyverse)
+```
+
+## Timeline
+
+Plotting the Twitter data over time is straight forward. We can use the code from the rtweet page. We will also collect more tweet by increasing the n parameter to 18000.
+
+```{r}
+rt <- search_tweets(query, n = 18000, include_rts = FALSE)
+```
+
+```{r}
+rt %>%
+  ts_plot("3 hours") +
+  ggplot2::theme_minimal() +
+  ggplot2::theme(plot.title = ggplot2::element_text(face = "bold")) +
+  ggplot2::labs(
+    x = NULL, y = NULL,
+    title = "Frequency of the term global warming from the past 9 days or so",
+    subtitle = "Twitter status (tweet) counts aggregated using three-hour intervals",
+    caption = "\nSource: Data collected from Twitter's REST API via rtweet"
+  )
+```
+
+The Reddit data is a little trickier but doable. First, we collect a bit more data.
+
+```{r}
+r <- find_thread_urls(query, period = 'all')
+```
+
+It looks like the Reddit api or the Reddit package collects 3 pages, no more. We have \~240 Reddit posts which span a longer period. If we had more time then we might look into finding another dataset with more information.
+
+Creating a timeline is a little trickier but doable.
+
+```{r}
+r <- r |>
+  mutate(date = lubridate::ymd(date_utc))
+```
+
+```{r}
+r %>%
+  mutate(time = lubridate::floor_date(date,
+                          unit = 'month')
+         ) %>%
+  group_by(time) %>%
+  summarise(n = n()) %>%
+  ggplot2::ggplot(aes(x=time, y=n)) +
+  ggplot2::theme_minimal() +
+  ggplot2::geom_col(pos = 'dodge') +
+  ggplot2::labs(
+  x = NULL, y = NULL,
+  title = "Frequency of thread URLs for the term Global Warming over the past year",
+  subtitle = "URL counts aggregated using month intervals",
+  caption = "\nSource: Data collected from Reddit's REST API via RedditExtractor"
+  )
+  
+```
+
+## Word Frequency
+
+Our final library contains some functions useful for text.
+
+```{r}
+install.packages('tidytext')
+```
+
+```{r}
+library(tidytext)
+```
+
+We can separate and count the words in our data. From these words we remove the most common words and count the occurrence of each word.
+
+```{r}
+data("stop_words")
+r %>%
+  select(text) %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words) %>%
+  count(word, sort=TRUE)
+```
+
+What does the Twitter data tell us?
+
+```{r}
+rt %>%
+  select(text) %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words) %>%
+  count(word, sort=TRUE)
+```
+
+```{r}
+r %>%
+  select(text) %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words) %>%
+  count(word, sort=TRUE) %>%
+  top_n(20) %>%
+  ggplot(aes(x=word, y=n)) +
+  ggplot2::theme_minimal() +
+  ggplot2::geom_col(pos = 'dodge') +
+  ggplot2::coord_flip() +
+  ggplot2::labs(
+    x = NULL, y = NULL,
+    title = "Top 20 words from a search for global warming from the past year or so",
+    subtitle = "Twitter tweets split by word with English stop words removed",
+    caption = "\nSource: Data collected from Twitter's REST API via rtweet"
+  )
+  
+```
+
+```{r}
+rt %>%
+  select(text) %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words) %>%
+  count(word, sort=TRUE) %>%
+  top_n(20) %>%
+  ggplot(aes(x=word, y=n)) +
+  ggplot2::theme_minimal() +
+  ggplot2::geom_col(pos = 'dodge') +
+  ggplot2::coord_flip() +
+  ggplot2::labs(
+    x = NULL, y = NULL,
+    title = "Top 20 words from a search for global warming from the past 9 days or so",
+    subtitle = "Reddit URL details split by word with English stop words removed",
+    caption = "\nSource: Data collected from Reddit's REST API via RedditExtractor"
+  )
+```
