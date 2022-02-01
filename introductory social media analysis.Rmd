@@ -1,8 +1,10 @@
 ---
 title: 'CDI: Introductory Social Media data collection and Analysis'
-author: "James Trip"
+author: "James Tripp"
 date: "01/02/2022"
 output: html_document
+link_citations: yes
+bibliography: references.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -19,13 +21,15 @@ Here we will collect and summarise data from two social media platforms: Twitter
 
 -   A twitter account (if you want to download tweets)
 
-Why use social media?
+## Social media
+
+Social media data is used throughout Academia. For example, one can look at Digital Humanities communities [@grandjean2016a] or carry out controversy analysis [@marres2015a] .
 
 ## Libraries
 
-We need additional libraries to do things like download tweets and reddit posts. Running the cell below (by pressing the green play button) will tell R to download the libraries we need.
+We need additional libraries to do things like download tweets and Reddit posts. Running the cell below (by pressing the green play button) will tell R to download the libraries we need.
 
-```{r, echo=FALSE}
+```{r, eval=FALSE}
 install.packages('rtweet')
 install.packages('RedditExtractoR')
 ```
@@ -100,13 +104,13 @@ Our data is collected using APIs for the different platforms. The term Applicati
 
 APIs control the amount and type of data you can collect. The search_tweets function uses an API which collects data from the past 7 days. If you want more data then you will need to sign up for the enterprise or Academic Track accounts. The find_thread_url function queries the Reddit front page and does not need authentication (see the result for global warming and 100 responses [here](https://www.reddit.com/search.json?q=global+warming&sort=top&t=month&limit=100)).
 
-The topic of APIs and their impact on research is an interesting topic. For example, Twitter is often studied because the data is very accessible. However, other platforms such as Tik Tok, YouTube or Weibo may be less studied because the APIs are restrictive. An API can also change over time and the nature of the data collected my be different as new feature are released. Also, how much do you know about the data selection processes via the API and can you validate the robustness of the data?
+The topic of APIs and their impact on research is an interesting topic. For example, Twitter is often studied because the data is very accessible. However, other platforms such as Tik Tok, YouTube or Weibo may be less studied because the APIs are restrictive. An API can also change over time and the nature of the data collected my be different as new feature are released. Also, how much do you know about the data selection processes via the API and can you validate the robustness of the data? How to go beyond APIs into a 'post-API environment' is an ongoing discussion [@perriam2020a] .
 
 ## More libraries
 
-We are going to use the popular tidyverse set of package. The tidyverse helps make tasks a bit easier and is commonly used in data science with R.
+We are going to use the popular [tidyverse set of packages](https://www.tidyverse.org/). The tidyverse helps make tasks a bit easier and is commonly used in data science with R.
 
-```{r}
+```{r, eval=FALSE}
 install.packages('tidyverse')
 ```
 
@@ -116,10 +120,10 @@ library(tidyverse)
 
 ## Timeline
 
-Plotting the Twitter data over time is straight forward. We can use the code from the rtweet page. We will also collect more tweet by increasing the n parameter to 18000.
+Plotting the Twitter data over time is straight forward. We can use the code from the [rtweet page](https://github.com/ropensci/rtweet). We will also collect more tweet by increasing the n parameter to 18000.
 
 ```{r}
-rt <- search_tweets(query, n = 18000, include_rts = FALSE)
+rt <- search_tweets(query, n = 100, include_rts = FALSE)
 ```
 
 ```{r}
@@ -173,7 +177,7 @@ r %>%
 
 Our final library contains some functions useful for text.
 
-```{r}
+```{r, eval=FALSE}
 install.packages('tidytext')
 ```
 
@@ -189,7 +193,8 @@ r %>%
   select(text) %>%
   unnest_tokens(word, text) %>%
   anti_join(stop_words) %>%
-  count(word, sort=TRUE)
+  count(word, sort=TRUE) %>%
+  head()
 ```
 
 What does the Twitter data tell us?
@@ -199,7 +204,8 @@ rt %>%
   select(text) %>%
   unnest_tokens(word, text) %>%
   anti_join(stop_words) %>%
-  count(word, sort=TRUE)
+  count(word, sort=TRUE) %>%
+  head()
 ```
 
 ```{r}
@@ -240,3 +246,23 @@ rt %>%
     caption = "\nSource: Data collected from Reddit's REST API via RedditExtractor"
   )
 ```
+
+## Going further
+
+These links may be helpful if you want to do more with R:
+
+-   [R basics with tabular data](https://programminghistorian.org/en/lessons/r-basics-with-tabular-data)
+
+-   [Basic text processing with R](https://programminghistorian.org/en/lessons/basic-text-processing-in-r)
+
+-   [Data wrangling and management in R](https://programminghistorian.org/en/lessons/data_wrangling_and_management_in_R)
+
+-   [Text Mining with R](https://www.tidytextmining.com/) - a rather nice book using the TidyText package (as we did above)
+
+-   [R for Data Science](https://r4ds.had.co.nz/) - one of the main books detailing how to use the Tidyverse package in a data science workflow
+
+-   [R Graph Gallery](https://www.r-graph-gallery.com/)- A rather nice collection of visualisations and associated R code
+
+There are also excellent books which details how to use R in a Humanities context. @jockers2014 is quite readable with some good examples. @arnold2015 offers a discussion of some of the different situations where one might use R in the Humanities.
+
+## References
