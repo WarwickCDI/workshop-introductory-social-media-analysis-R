@@ -21,6 +21,11 @@ You can open this notebook in an online Binder container by clicking on the
  link below. At present you will be unable to authenticate with Twitter from
  within the binder container. You can run all the code with the Reddit dataset.
  
+ <!-- badges: start -->
+[![Launch Rstudio Binder](http://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/WarwickCDI/workshop-introductory-social-media-analysis-R/master?urlpath=rstudio)
+<!-- badges: end -->
+
+ 
 [![Binder](http://mybinder.org/badge_logo.svg)](http://mybinder.org/v2/gh/WarwickCDI/workshop-introductory-social-media-analysis-R/main?urlpath=rstudio)
 
 ## Social media

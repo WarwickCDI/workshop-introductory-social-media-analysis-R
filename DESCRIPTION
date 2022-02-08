@@ -1,0 +1,20 @@
+Type: Compendium
+Package: CDI: Introductory social media analysis
+Title: Files for an introductory social media analysis workshop
+Version: 0.0.1
+Authors@R: 
+    person("James", "Tripp", , "james.tripp@warwick.ac.uk", role = c("aut", "cre"))
+Description: Files for a workshop delivered by IDG Technology For Research
+    as part of the Centre for Interdisciplinary Methodologies
+License: What license it uses
+Depends: 
+    ggplot2,
+    knitr,
+    lubridate,
+    RedditExtractoR,
+    rmarkdown,
+    rtweet,
+    tidytext,
+    tidyverse
+Encoding: UTF-8
+LazyData: true
