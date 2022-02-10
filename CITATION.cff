@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Tripp"
+  given-names: "James"
+  orcid: "https://orcid.org/0000-0003-2471-3411"
+title: "CDI: Introductory social media analysis workshop"
+version: 2.0.4
+doi: 10.5281/zenodo.6036129
+date-released: 2022-02-10
+url: "https://github.com/WarwickCDI/workshop-introductory-social-media-analysis-R"
