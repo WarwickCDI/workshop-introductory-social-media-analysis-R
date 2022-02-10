@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/454447997.svg)](https://zenodo.org/badge/latestdoi/454447997)
+
 CDI: Introductory Social Media data collection and Analysis
 ================
 James Tripp
